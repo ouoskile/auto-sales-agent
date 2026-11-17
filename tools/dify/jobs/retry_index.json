@@ -1,0 +1,12 @@
+{
+  "method": "POST",
+  "path": "/console/api/datasets/403fbc9d-3c82-4077-8033-6761821f68f3/retry",
+  "json": {
+    "document_ids": [
+      "fcbf384d-a48d-477d-ad83-d6b211ada0f3",
+      "9facd2cd-498e-401a-84a3-9c81f4872a5a",
+      "0111f510-a0df-46ba-94cc-ad562d65212e",
+      "9b735d54-e518-4af7-b92c-f417e40f725c"
+    ]
+  }
+}

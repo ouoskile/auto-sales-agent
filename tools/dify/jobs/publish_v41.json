@@ -1,0 +1,9 @@
+{
+  "method": "POST",
+  "path": "/console/api/apps/479d4779-9f96-4553-a8d8-e0401da50d35/workflows/publish",
+  "json": {
+    "marked_name": "v4.1-检索来源含相关度",
+    "marked_comment": "sources_attach 相关度取值修正：检索结果的 score 在 metadata.score 内，改为两处兜底取值；其余同 v4"
+  },
+  "out": "tools/dify/refs/publish_v41_result.json"
+}

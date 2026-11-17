@@ -1,0 +1,145 @@
+{
+  "generated_at": "2026-11-17T17:55:23+08:00",
+  "documents": [
+    {
+      "name": "01_微型入门代步与紧凑型轿车.md",
+      "chars": 4638,
+      "counts": {
+        "level1": 0,
+        "level2": 0,
+        "level3": 0
+      },
+      "hits": []
+    },
+    {
+      "name": "02_中型轿车与紧凑型SUV.md",
+      "chars": 4647,
+      "counts": {
+        "level1": 0,
+        "level2": 0,
+        "level3": 0
+      },
+      "hits": []
+    },
+    {
+      "name": "03_中大型SUV与MPV.md",
+      "chars": 3775,
+      "counts": {
+        "level1": 0,
+        "level2": 0,
+        "level3": 0
+      },
+      "hits": []
+    },
+    {
+      "name": "04_高端特色代表.md",
+      "chars": 1164,
+      "counts": {
+        "level1": 0,
+        "level2": 0,
+        "level3": 0
+      },
+      "hits": []
+    },
+    {
+      "name": "05_购车基础与三电.md",
+      "chars": 24792,
+      "counts": {
+        "level1": 0,
+        "level2": 0,
+        "level3": 0
+      },
+      "hits": []
+    },
+    {
+      "name": "06_智能驾驶与座舱.md",
+      "chars": 7843,
+      "counts": {
+        "level1": 0,
+        "level2": 0,
+        "level3": 0
+      },
+      "hits": []
+    },
+    {
+      "name": "07_价格交易与权益保险.md",
+      "chars": 18557,
+      "counts": {
+        "level1": 0,
+        "level2": 3,
+        "level3": 4
+      },
+      "hits": [
+        {
+          "level": "level2",
+          "category": "金融方案",
+          "word": "低首付",
+          "line": 7,
+          "context": "> **合规提示**：涉及「长期质保」「免息」「低首付」等表述须同时说明适用前提（首任非营运车主、额度与征信条件、以厂家官方条款为准），不得只讲权益不讲限制。"
+        },
+        {
+          "level": "level2",
+          "category": "金融方案",
+          "word": "低首付",
+          "line": 603,
+          "context": "#### 2. 低首付方案（首付比例不得低于政策下限）"
+        },
+        {
+          "level": "level2",
+          "category": "金融方案",
+          "word": "低首付",
+          "line": 615,
+          "context": "   - 严禁宣传「超低首付」「免息」等不附加任何条件的方案。"
+        },
+        {
+          "level": "level3",
+          "category": "争议",
+          "word": "质量问题",
+          "line": 389,
+          "context": "- 定义：厂家对整车非易损件的质量保修，在质保期内，非人为损坏的质量问题，免费维修、更换零件。"
+        },
+        {
+          "level": "level3",
+          "category": "争议",
+          "word": "质量问题",
+          "line": 392,
+          "context": "- 保修范围：发动机、变速箱、底盘、车身、电气系统等非易损件的质量问题。"
+        },
+        {
+          "level": "level3",
+          "category": "争议",
+          "word": "质量问题",
+          "line": 398,
+          "context": "- 销售话术：“整车质保3年10万公里，期间有任何质量问题，免费修免费换，您用车完全放心。”"
+        },
+        {
+          "level": "level3",
+          "category": "争议",
+          "word": "质量问题",
+          "line": 420,
+          "context": "- 注意：易损件正常磨损不质保，只有质量问题才质保。"
+        }
+      ]
+    },
+    {
+      "name": "08_需求分析与产品介绍.md",
+      "chars": 5673,
+      "counts": {
+        "level1": 0,
+        "level2": 0,
+        "level3": 0
+      },
+      "hits": []
+    },
+    {
+      "name": "09_客户跟进与竞品对比.md",
+      "chars": 6667,
+      "counts": {
+        "level1": 0,
+        "level2": 0,
+        "level3": 0
+      },
+      "hits": []
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "method": "POST",
+  "path": "/console/api/datasets/403fbc9d-3c82-4077-8033-6761821f68f3/documents",
+  "json": {
+    "indexing_technique": "high_quality",
+    "data_source": {
+      "info_list": {
+        "data_source_type": "upload_file",
+        "file_info_list": {
+          "file_ids": [
+            "81053aaa-1223-4857-87c5-23b4e6f3d252"
+          ]
+        }
+      }
+    },
+    "process_rule": {
+      "mode": "automatic"
+    },
+    "doc_form": "text_model",
+    "doc_language": "Chinese"
+  }
+}

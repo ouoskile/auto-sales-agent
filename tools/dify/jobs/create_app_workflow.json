@@ -1,0 +1,12 @@
+{
+  "method": "POST",
+  "path": "/console/api/apps",
+  "json": {
+    "name": "汽车销售接待智能体",
+    "description": "门店销售接待 AI：意图识别→画像采集→车型推荐 RAG→报价库存→预约试驾→异议处理→兜底",
+    "mode": "workflow",
+    "icon_type": "emoji",
+    "icon": "🚗",
+    "icon_background": "#FFEAD5"
+  }
+}

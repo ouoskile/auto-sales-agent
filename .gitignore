@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Dify 本地私密产物（凭据/会话/运行结果，绝不入库）
+.dify_api_key
+.dify_token
+.dify_csrf
+tools/dify/refs/api_key.json
+tools/dify/refs/runs/
+tools/dify/refs/*.sse
+tools/dify/refs/publish_*_result.json
+tools/dify/refs/app_workflow_ref.json
+tools/dify/refs/app_workflow_ref.zip
+
+# 个人隐私（简历等，不入库）
+简历/
+
+# ---- 以下为 V1 原型（Python 知识库工具链 + QA），保留在提交历史 b507a66，不再跟踪 ----
+docs/product/
+docs/qa/
+knowledge_base/
+qa_tmp/
+subagents/
+tests/
+tools/kb_ingest.py
+tools/kb_search.py
+tools/kb_lint.py
+tools/kb_audit.py
+tools/kb_demo.py
+tools/update_gitignore.py
+.tmp_tests/
+
+tools/dify/refs/draft_*.json

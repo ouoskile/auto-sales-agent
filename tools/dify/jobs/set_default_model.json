@@ -1,0 +1,18 @@
+{
+  "method": "POST",
+  "path": "/console/api/workspaces/current/default-model",
+  "json": {
+    "model_settings": [
+      {
+        "model_type": "text-embedding",
+        "provider": "langgenius/tongyi/tongyi",
+        "model": "text-embedding-v4"
+      },
+      {
+        "model_type": "llm",
+        "provider": "langgenius/deepseek/deepseek",
+        "model": "deepseek-flash"
+      }
+    ]
+  }
+}

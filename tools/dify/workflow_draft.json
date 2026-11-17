@@ -1,0 +1,2665 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "type": "custom",
+        "position": {
+          "x": 0,
+          "y": 400
+        },
+        "positionAbsolute": {
+          "x": 0,
+          "y": 400
+        },
+        "width": 242,
+        "height": 120,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "start",
+          "title": "开始",
+          "desc": "接收用户输入 user_query；chat_history 可选，用于前端把上一轮追问拼进来",
+          "variables": [
+            {
+              "variable": "user_query",
+              "label": "用户问题",
+              "type": "text-input",
+              "required": true,
+              "max_length": 2000,
+              "default": "",
+              "hint": "客户这一轮说的话；补充追问时可把上一轮问答拼进来",
+              "placeholder": "例如：15 万左右，家用，有固定车位，帮我推荐一台 SUV",
+              "options": []
+            },
+            {
+              "variable": "chat_history",
+              "label": "历史对话",
+              "type": "paragraph",
+              "required": false,
+              "max_length": 4000,
+              "default": "",
+              "hint": "可选；前端拼装的多轮历史，当前 Prompt 未引用",
+              "placeholder": "",
+              "options": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "intent_classifier",
+        "type": "custom",
+        "position": {
+          "x": 360,
+          "y": 400
+        },
+        "positionAbsolute": {
+          "x": 360,
+          "y": 400
+        },
+        "width": 242,
+        "height": 240,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "question-classifier",
+          "title": "意图分类",
+          "desc": "5 类意图，分支 handle 即 class id：1 车型咨询 / 2 报价库存 / 3 预约试驾 / 4 价格异议 / 5 闲聊无关",
+          "query_variable_selector": [
+            "start",
+            "user_query"
+          ],
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.1
+            }
+          },
+          "classes": [
+            {
+              "id": "1",
+              "name": "车型咨询",
+              "label": "车型咨询"
+            },
+            {
+              "id": "2",
+              "name": "报价库存",
+              "label": "报价库存"
+            },
+            {
+              "id": "3",
+              "name": "预约试驾",
+              "label": "预约试驾"
+            },
+            {
+              "id": "4",
+              "name": "价格异议",
+              "label": "价格异议"
+            },
+            {
+              "id": "5",
+              "name": "闲聊无关",
+              "label": "闲聊无关"
+            }
+          ],
+          "instruction": "你是汽车门店销售接待前台的意图分类器。只判断用户这句话属于哪一类，不要回答用户问题。\n\n分类标准：\n1. 车型咨询：想了解车型、参数、续航、空间、配置、动力、安全，要求推荐车型，对比车型，问\"家用/通勤买什么车合适\"。\n2. 报价库存：问价格、落地价、优惠、活动、现车、库存、提车周期、金融方案、置换、上牌费用、保险。\n3. 预约试驾：想试驾、想看车、想约到店时间，或直接提供姓名/手机号要预约。\n4. 价格异议：觉得贵、要求再便宜、说别家更便宜、说网上价格更低、质疑配置/续航/保值率、表达犹豫或砍价。\n5. 闲聊无关：打招呼、感谢、告别、问天气/吃饭/写代码等与购车无关的内容。\n\n多意图处理：一句话包含多个意图时，按优先级归类：预约试驾 > 报价库存 > 车型咨询 > 价格异议 > 闲聊无关。\n判定时只看用户意图归属，不要回答用户的问题；边界模糊时选最接近的一类。",
+          "vision": {
+            "enabled": false
+          }
+        }
+      },
+      {
+        "id": "profile_extract",
+        "type": "custom",
+        "position": {
+          "x": 720,
+          "y": 0
+        },
+        "positionAbsolute": {
+          "x": 720,
+          "y": 0
+        },
+        "width": 242,
+        "height": 160,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "画像抽取",
+          "desc": "从用户话里抽客户画像，输出严格 JSON；缺字段填 null",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.1
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店销售顾问的需求分析师。任务：从用户对话中抽取客户画像字段，输出一个严格 JSON 对象。\n\n字段定义：\n- budget：购车预算，字符串。保留用户原话的量级，例如 \"15万左右\"、\"12-20万\"、\"预算20万以上\"。\n- scene：主要用车场景，字符串。取值优先用 \"通勤\" / \"家用\" / \"商务\"，可组合，如 \"家用+通勤\"。\n- family_num：家庭人数，字符串，例如 \"3口之家\"、\"一家五口\"、\"两个人\"。\n- charge：是否有固定车位或家用充电桩，字符串。只能取 \"有\" / \"无\" / \"不确定\"。\n- intend_car：意向车型或车型线索，字符串，例如 \"五菱宏光 MINIEV\"、\"比亚迪海鸥\"、\"SUV\"、\"轿车\"、\"还没定\"。\n- missing：数组，列出上面 5 个字段中用户没有明确说到的字段名（英文键名），没有缺失就输出空数组。\n\n硬性规则：\n1. 只抽取用户明确表达的信息；没提到的字段一律填 null，绝不猜测、绝不用常识补全。\n2. 用户说\"随便看看\"\"帮我推荐\"但没有预算时，budget 填 null，不要默认 15 万。\n3. 用户说\"有车位\"不等于\"有充电桩\"：只有明确提到充电桩/能装桩/可充电才填 \"有\"；只说车位则 charge 填 \"不确定\"。\n4. 输出必须是单个 JSON 对象，不要 markdown 代码块、不要解释文字、不要前后缀。键名固定为 budget、scene、family_num、charge、intend_car、missing。"
+            },
+            {
+              "role": "user",
+              "text": "用户本句话：\n{{#start.user_query#}}\n\n请输出画像 JSON。"
+            }
+          ],
+          "context": {
+            "enabled": false,
+            "variable_selector": []
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "profile_parse",
+        "type": "custom",
+        "position": {
+          "x": 1080,
+          "y": 0
+        },
+        "positionAbsolute": {
+          "x": 1080,
+          "y": 0
+        },
+        "width": 242,
+        "height": 200,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "code",
+          "title": "画像解析",
+          "desc": "解析画像 JSON，输出 is_complete / missing_text / profile_summary",
+          "code_language": "python3",
+          "code": "import json\nimport re\n\n\ndef main(profile_raw: str, user_query: str) -> dict:\n    \"\"\"把 LLM 输出的画像 JSON 洗成稳定结构，并判断画像是否完整。\"\"\"\n    text = (profile_raw or \"\").strip()\n    text = re.sub(r\"^```(?:json)?\", \"\", text).strip()\n    text = re.sub(r\"```$\", \"\", text).strip()\n    data = {}\n    match = re.search(r\"\\{.*\\}\", text, re.S)\n    if match:\n        try:\n            data = json.loads(match.group(0))\n        except Exception:\n            data = {}\n    if not isinstance(data, dict):\n        data = {}\n\n    def pick(key):\n        value = data.get(key)\n        if value is None:\n            return \"\"\n        if isinstance(value, bool):\n            return \"是\" if value else \"否\"\n        if isinstance(value, (int, float)):\n            return str(value)\n        if isinstance(value, list):\n            return \"、\".join(str(x) for x in value if x not in (None, \"\"))\n        return str(value).strip()\n\n    budget = pick(\"budget\")\n    scene = pick(\"scene\")\n    family_num = pick(\"family_num\")\n    charge = pick(\"charge\")\n    intend_car = pick(\"intend_car\")\n    if charge not in (\"有\", \"无\", \"不确定\"):\n        charge = \"\" if not charge else \"不确定\"\n\n    # 完整画像的最小要求：预算 + 场景（或家庭人数）+ 充电条件\n    missing = []\n    if not budget:\n        missing.append(\"预算\")\n    if not scene and not family_num:\n        missing.append(\"主要用途（家用还是通勤）\")\n    if not charge:\n        missing.append(\"有无固定车位/充电桩\")\n\n    summary_parts = []\n    if budget:\n        summary_parts.append(\"预算：\" + budget)\n    if scene:\n        summary_parts.append(\"场景：\" + scene)\n    if family_num:\n        summary_parts.append(\"家庭人数：\" + family_num)\n    if charge:\n        summary_parts.append(\"充电条件：\" + charge)\n    if intend_car:\n        summary_parts.append(\"意向车型：\" + intend_car)\n\n    profile = {\n        \"budget\": budget or None,\n        \"scene\": scene or None,\n        \"family_num\": family_num or None,\n        \"charge\": charge or None,\n        \"intend_car\": intend_car or None,\n    }\n    return {\n        \"budget\": budget,\n        \"scene\": scene,\n        \"family_num\": family_num,\n        \"charge\": charge,\n        \"intend_car\": intend_car,\n        \"profile_json\": json.dumps(profile, ensure_ascii=False),\n        \"is_complete\": len(missing) == 0,\n        \"missing_text\": \"、\".join(missing),\n        \"profile_summary\": \"；\".join(summary_parts) if summary_parts else \"（用户尚未提供有效画像信息）\",\n    }\n",
+          "variables": [
+            {
+              "variable": "profile_raw",
+              "value_selector": [
+                "profile_extract",
+                "text"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "user_query",
+              "value_selector": [
+                "start",
+                "user_query"
+              ],
+              "value_type": "string"
+            }
+          ],
+          "outputs": {
+            "budget": {
+              "type": "string",
+              "children": null
+            },
+            "scene": {
+              "type": "string",
+              "children": null
+            },
+            "family_num": {
+              "type": "string",
+              "children": null
+            },
+            "charge": {
+              "type": "string",
+              "children": null
+            },
+            "intend_car": {
+              "type": "string",
+              "children": null
+            },
+            "profile_json": {
+              "type": "string",
+              "children": null
+            },
+            "is_complete": {
+              "type": "boolean",
+              "children": null
+            },
+            "missing_text": {
+              "type": "string",
+              "children": null
+            },
+            "profile_summary": {
+              "type": "string",
+              "children": null
+            }
+          }
+        }
+      },
+      {
+        "id": "profile_check",
+        "type": "custom",
+        "position": {
+          "x": 1440,
+          "y": 0
+        },
+        "positionAbsolute": {
+          "x": 1440,
+          "y": 0
+        },
+        "width": 242,
+        "height": 98,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "if-else",
+          "title": "画像是否完整",
+          "desc": "预算 + 用途 + 充电条件齐全才直接推荐，否则追问",
+          "logical_operator": "and",
+          "cases": [
+            {
+              "case_id": "true",
+              "logical_operator": "and",
+              "conditions": [
+                {
+                  "id": "cond-profile_parse-is_complete-is",
+                  "variable_selector": [
+                    "profile_parse",
+                    "is_complete"
+                  ],
+                  "comparison_operator": "is",
+                  "value": true,
+                  "varType": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "profile_followup",
+        "type": "custom",
+        "position": {
+          "x": 1800,
+          "y": 200
+        },
+        "positionAbsolute": {
+          "x": 1800,
+          "y": 200
+        },
+        "width": 242,
+        "height": 160,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "画像追问",
+          "desc": "画像不全时生成追问话术，作为本轮结果返回",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.6
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店的销售助理，说话亲切、口语化，像真人顾问。当前客户信息不全，需要你追问补齐。\n\n规则：\n1. 只问缺失的信息，一次问完，最多 3 个问题，不要反复追问已有的信息。\n2. 问题要具体、好回答，给出例子，例如\"预算大概多少？12-20 万这个区间可以吗\"。\n3. 必须覆盖缺失字段对应的问题：预算 / 家用还是通勤 / 有无固定车位或充电桩。\n4. 不要编造车型、价格、优惠；不要长篇推销。\n5. 结尾用一句轻松的话鼓励客户回复，例如\"您说个大概就行，我帮您筛两台合适的\"。\n6. 输出直接给客户看的话术，150 字以内，不要 JSON、不要标题、不要分点符号堆砌。"
+            },
+            {
+              "role": "user",
+              "text": "缺失字段：{{#profile_parse.missing_text#}}\n客户刚才说：{{#start.user_query#}}\n已知画像：{{#profile_parse.profile_summary#}}\n请生成追问话术。"
+            }
+          ],
+          "context": {
+            "enabled": false,
+            "variable_selector": []
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "kb_query_build",
+        "type": "custom",
+        "position": {
+          "x": 1800,
+          "y": 0
+        },
+        "positionAbsolute": {
+          "x": 1800,
+          "y": 0
+        },
+        "width": 242,
+        "height": 98,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "template-transform",
+          "title": "检索词拼装",
+          "desc": "把客户画像 + 原话拼成知识库检索 query",
+          "template": "客户问题：{{ query }}\n客户画像：{{ summary }}\n想了解：续航 轴距 空间 配置 指导价",
+          "variables": [
+            {
+              "variable": "summary",
+              "value_selector": [
+                "profile_parse",
+                "profile_summary"
+              ]
+            },
+            {
+              "variable": "query",
+              "value_selector": [
+                "start",
+                "user_query"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "kb_models",
+        "type": "custom",
+        "position": {
+          "x": 2160,
+          "y": 0
+        },
+        "positionAbsolute": {
+          "x": 2160,
+          "y": 0
+        },
+        "width": 242,
+        "height": 140,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "knowledge-retrieval",
+          "title": "车型知识检索",
+          "desc": "汽车销售知识库，多路召回 top_k=3，阈值 0.5",
+          "query_variable_selector": [
+            "kb_query_build",
+            "output"
+          ],
+          "query_attachment_selector": [],
+          "dataset_ids": [
+            "403fbc9d-3c82-4077-8033-6761821f68f3"
+          ],
+          "retrieval_mode": "multiple",
+          "multiple_retrieval_config": {
+            "top_k": 3,
+            "score_threshold": 0.5,
+            "score_threshold_enabled": true,
+            "reranking_enable": false,
+            "reranking_mode": "reranking_model",
+            "reranking_model": null,
+            "weights": null
+          }
+        }
+      },
+      {
+        "id": "recommend",
+        "type": "custom",
+        "position": {
+          "x": 2520,
+          "y": 0
+        },
+        "positionAbsolute": {
+          "x": 2520,
+          "y": 0
+        },
+        "width": 242,
+        "height": 170,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "车型推荐",
+          "desc": "基于知识库检索结果按 FABE 推荐 1-2 款车并邀约试驾",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.6
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店的金牌销售顾问，按 FABE 结构给客户推荐车型。\n\n规则：\n1. 只推荐知识库上下文中真实存在的车型（例如 五菱宏光 MINIEV、比亚迪海鸥、零跑 A10 等），不得编造知识库中没有的车型，也不得编造任何参数；上下文没提到的车型与参数一律不说。\n2. 每款车按 FABE 讲清楚：\n   - F（Feature 配置/参数）：引用上下文里的真实参数（续航、轴距、能源类型、亮点配置）。\n   - A（Advantage 优势）：这款车相对其他车型强在哪。\n   - B（Benefit 利益）：对这位客户的具体用车场景意味着什么（例如带娃空间、通勤成本、长途补能）。\n   - E（Evidence 依据）：用\"知识库显示/门店资料\"这类说法，不夸大。\n3. 必须结合客户画像（预算、场景、家庭人数、充电条件）说明\"为什么适合你\"，并诚实点出 1 个\"不一定适合的点\"。\n4. 如果上下文为空或没有可用车型信息：不要编造参数，直接说明\"这部分资料需要销售顾问帮您确认\"，并邀请到店/留资。\n5. 涉及价格、优惠、库存、交付周期时，只说\"以门店最新报价/库存为准\"，不要给出具体数字。\n6. 结尾主动邀约试驾，问一句方便的时间（例如\"这周六上午还是周日下午方便？\"）。\n7. 输出给客户看的自然话术，结构清晰（可用短标题+短段落），300 字以内，不要 JSON、不要表格。"
+            },
+            {
+              "role": "user",
+              "text": "客户画像：{{#profile_parse.profile_summary#}}\n客户原话：{{#start.user_query#}}\n知识库检索结果：\n{{#context#}}"
+            }
+          ],
+          "context": {
+            "enabled": true,
+            "variable_selector": [
+              "kb_models",
+              "result"
+            ]
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "quote_extract",
+        "type": "custom",
+        "position": {
+          "x": 720,
+          "y": 440
+        },
+        "positionAbsolute": {
+          "x": 720,
+          "y": 440
+        },
+        "width": 242,
+        "height": 200,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "parameter-extractor",
+          "title": "报价要素抽取",
+          "desc": "抽取 brand/model 用于查库存与报价",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.1
+            }
+          },
+          "query": [
+            "start",
+            "user_query"
+          ],
+          "parameters": [
+            {
+              "name": "brand",
+              "type": "string",
+              "options": [],
+              "description": "用户提到的品牌，如“五菱”“比亚迪”“零跑”；没提就留空，不要猜",
+              "required": false
+            },
+            {
+              "name": "model",
+              "type": "string",
+              "options": [],
+              "description": "用户要问的车型，如“五菱宏光 MINIEV”“比亚迪海鸥”“SUV”“那台混动”；只从用户话里提取，没提留空",
+              "required": false
+            }
+          ],
+          "instruction": "从用户的问题中提取\"要查询库存/报价的车型\"信息。\n- brand：品牌名，用户没提就留空。\n- model：车型名或车型线索，例如 五菱宏光 MINIEV、比亚迪海鸥、零跑 A10、SUV、轿车、混动、那台车。\n- 只提取用户明确说过的内容，不要根据上下文猜测车型，不要编造。\n- 如果用户只问\"落地多少钱\"而没提任何车型，model 留空。",
+          "reasoning_mode": "prompt",
+          "vision": {
+            "enabled": false
+          }
+        }
+      },
+      {
+        "id": "inventory_api",
+        "type": "custom",
+        "position": {
+          "x": 1080,
+          "y": 440
+        },
+        "positionAbsolute": {
+          "x": 1080,
+          "y": 440
+        },
+        "width": 242,
+        "height": 160,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "http-request",
+          "title": "库存报价接口",
+          "desc": "GET 宿主机 api_stub 的 /api/inventory（SSRF 已放行 192.168.65.0/24）",
+          "method": "get",
+          "url": "http://host.docker.internal:8000/api/inventory?brand={{#quote_extract.brand#}}&model={{#quote_extract.model#}}",
+          "authorization": {
+            "type": "no-auth",
+            "config": null
+          },
+          "headers": "Accept: application/json",
+          "params": "",
+          "body": {
+            "type": "none",
+            "data": []
+          },
+          "timeout": {
+            "connect": 5,
+            "read": 10,
+            "write": 5
+          },
+          "ssl_verify": true,
+          "retry_config": {
+            "retry_enabled": false,
+            "max_retries": 0,
+            "retry_interval": 0
+          },
+          "error_strategy": "default-value",
+          "default_value": [
+            {
+              "key": "status_code",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "key": "body",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "key": "headers",
+              "type": "object",
+              "value": {}
+            }
+          ]
+        }
+      },
+      {
+        "id": "inventory_ok",
+        "type": "custom",
+        "position": {
+          "x": 1440,
+          "y": 440
+        },
+        "positionAbsolute": {
+          "x": 1440,
+          "y": 440
+        },
+        "width": 242,
+        "height": 98,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "if-else",
+          "title": "库存接口是否成功",
+          "desc": "status_code == 200 走报价话术，否则走兜底",
+          "logical_operator": "and",
+          "cases": [
+            {
+              "case_id": "true",
+              "logical_operator": "and",
+              "conditions": [
+                {
+                  "id": "cond-inventory_api-status_code-=",
+                  "variable_selector": [
+                    "inventory_api",
+                    "status_code"
+                  ],
+                  "comparison_operator": "=",
+                  "value": "200",
+                  "varType": "number"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "quote_reply",
+        "type": "custom",
+        "position": {
+          "x": 1800,
+          "y": 380
+        },
+        "positionAbsolute": {
+          "x": 1800,
+          "y": 380
+        },
+        "width": 242,
+        "height": 170,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "报价话术",
+          "desc": "把库存/报价接口 JSON 整理成口语化报价，注明以门店核算为准",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.5
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店的销售顾问，负责把库存/报价接口返回的数据整理成口语化的报价话术。\n\n规则：\n1. 只使用接口返回 JSON 里出现的字段和数字，不要编造价格、优惠、库存、交付周期。\n2. 必须覆盖：车型、库存状态（有现车/需排期/需预订）、参考落地价、当前优惠方案、预计交付时间。\n3. 把优惠说清楚（现金优惠/置换补贴/金融贴息/礼包），并说明可叠加情况以门店为准。\n4. 结尾必须加一句\"以上是门店参考价，最终价格以销售顾问现场核算为准\"。\n5. 如果接口返回里字段缺失或含义不明，就说\"这部分需要顾问帮您确认\"，不要猜数字。\n6. 追问一句客户大概什么时候用车/是否方便到店，自然过渡到邀约。\n7. 输出给客户看的自然话术，200 字以内，不要 JSON、不要 Markdown 表格。"
+            },
+            {
+              "role": "user",
+              "text": "客户原话：{{#start.user_query#}}\n库存/报价接口返回（JSON）：\n{{#inventory_api.body#}}"
+            }
+          ],
+          "context": {
+            "enabled": false,
+            "variable_selector": []
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "quote_fallback",
+        "type": "custom",
+        "position": {
+          "x": 1800,
+          "y": 600
+        },
+        "positionAbsolute": {
+          "x": 1800,
+          "y": 600
+        },
+        "width": 242,
+        "height": 150,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "报价兜底",
+          "desc": "库存/报价接口失败时的不编数字兜底话术",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.5
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店销售顾问。现在库存/报价系统暂时无法返回数据，请生成一段得体的兜底话术。\n\n规则：\n1. 先致歉并说明\"报价/库存系统暂时查询不到\"。\n2. 绝对不要编造库存状态、价格、优惠或交付时间。\n3. 给客户两个可行选择：留手机号由顾问核实后回复；或直接到店看车（现车可当天试驾）。\n4. 语气诚恳、简短（120 字以内），结尾用一个问题推进对话。"
+            },
+            {
+              "role": "user",
+              "text": "客户原话：{{#start.user_query#}}"
+            }
+          ],
+          "context": {
+            "enabled": false,
+            "variable_selector": []
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "appt_extract",
+        "type": "custom",
+        "position": {
+          "x": 720,
+          "y": 840
+        },
+        "positionAbsolute": {
+          "x": 720,
+          "y": 840
+        },
+        "width": 242,
+        "height": 220,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "parameter-extractor",
+          "title": "预约要素抽取",
+          "desc": "抽取 name/phone/model/time 四个预约要素",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.1
+            }
+          },
+          "query": [
+            "start",
+            "user_query"
+          ],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "options": [],
+              "description": "客户姓名/称呼，如“张三”“王女士”；没提留空",
+              "required": false
+            },
+            {
+              "name": "phone",
+              "type": "string",
+              "options": [],
+              "description": "11 位手机号，去掉空格和横线；没提留空",
+              "required": false
+            },
+            {
+              "name": "model",
+              "type": "string",
+              "options": [],
+              "description": "意向车型，如“五菱宏光 MINIEV”“比亚迪海鸥”；没提留空",
+              "required": false
+            },
+            {
+              "name": "time",
+              "type": "string",
+              "options": [],
+              "description": "预约时间，保留用户原话，如“本周六上午”“11 月 21 日 10 点”；没提留空",
+              "required": false
+            }
+          ],
+          "instruction": "从用户的话中提取预约试驾需要的 4 个要素。\n- 只提取用户明确说出的内容，没提到就留空字符串，不要编造姓名、手机号或时间。\n- 手机号必须原样保留 11 位数字（可去掉空格/横线）。\n- 时间保留用户原话，不要自己换算成具体日期。\n- 如果用户说\"这周六\"而没说具体几点，time 填\"本周六\"，不要补时间。",
+          "reasoning_mode": "prompt",
+          "vision": {
+            "enabled": false
+          }
+        }
+      },
+      {
+        "id": "appt_complete",
+        "type": "custom",
+        "position": {
+          "x": 1080,
+          "y": 840
+        },
+        "positionAbsolute": {
+          "x": 1080,
+          "y": 840
+        },
+        "width": 242,
+        "height": 160,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "if-else",
+          "title": "预约要素是否齐全",
+          "desc": "姓名/手机号/车型/时间四个都非空才提交工单",
+          "logical_operator": "and",
+          "cases": [
+            {
+              "case_id": "true",
+              "logical_operator": "and",
+              "conditions": [
+                {
+                  "id": "cond-appt_extract-name-not_empty",
+                  "variable_selector": [
+                    "appt_extract",
+                    "name"
+                  ],
+                  "comparison_operator": "not empty",
+                  "value": null,
+                  "varType": "string"
+                },
+                {
+                  "id": "cond-appt_extract-phone-not_empty",
+                  "variable_selector": [
+                    "appt_extract",
+                    "phone"
+                  ],
+                  "comparison_operator": "not empty",
+                  "value": null,
+                  "varType": "string"
+                },
+                {
+                  "id": "cond-appt_extract-model-not_empty",
+                  "variable_selector": [
+                    "appt_extract",
+                    "model"
+                  ],
+                  "comparison_operator": "not empty",
+                  "value": null,
+                  "varType": "string"
+                },
+                {
+                  "id": "cond-appt_extract-time-not_empty",
+                  "variable_selector": [
+                    "appt_extract",
+                    "time"
+                  ],
+                  "comparison_operator": "not empty",
+                  "value": null,
+                  "varType": "string"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "appt_followup",
+        "type": "custom",
+        "position": {
+          "x": 1440,
+          "y": 1040
+        },
+        "positionAbsolute": {
+          "x": 1440,
+          "y": 1040
+        },
+        "width": 242,
+        "height": 160,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "预约追问",
+          "desc": "预约要素不全时追问姓名/手机号/车型/时间",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.6
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店销售助理，客户想预约试驾但信息不全。请生成追问话术。\n\n规则：\n1. 只追问缺失的要素（姓名 / 手机号 / 意向车型 / 预约时间），已提供的不要重复问。\n2. 一次问完所有缺失项，问题要具体，给出格式例子，例如\"手机号方便留 11 位吗，用来给您排试驾\"。\n3. 说明用途：留手机号是为了安排试驾车和到店接待，不会骚扰。\n4. 不编造车型库存和价格；语气亲切，100 字以内。\n5. 输出直接给客户看的话术，不要 JSON。"
+            },
+            {
+              "role": "user",
+              "text": "客户原话：{{#start.user_query#}}\n已提取：姓名={{#appt_extract.name#}}；手机号={{#appt_extract.phone#}}；车型={{#appt_extract.model#}}；时间={{#appt_extract.time#}}\n请生成追问。"
+            }
+          ],
+          "context": {
+            "enabled": false,
+            "variable_selector": []
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "appt_api",
+        "type": "custom",
+        "position": {
+          "x": 1440,
+          "y": 840
+        },
+        "positionAbsolute": {
+          "x": 1440,
+          "y": 840
+        },
+        "width": 242,
+        "height": 160,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "http-request",
+          "title": "提交预约工单",
+          "desc": "POST 宿主机 api_stub 的 /api/appointment；重试必须关闭，避免重复建单",
+          "method": "post",
+          "url": "http://host.docker.internal:8000/api/appointment",
+          "authorization": {
+            "type": "no-auth",
+            "config": null
+          },
+          "headers": "Content-Type: application/json",
+          "params": "",
+          "body": {
+            "type": "json",
+            "data": [
+              {
+                "key": "",
+                "type": "text",
+                "value": "{\"name\":\"{{#appt_extract.name#}}\",\"phone\":\"{{#appt_extract.phone#}}\",\"model\":\"{{#appt_extract.model#}}\",\"time\":\"{{#appt_extract.time#}}\"}"
+              }
+            ]
+          },
+          "timeout": {
+            "connect": 5,
+            "read": 10,
+            "write": 5
+          },
+          "ssl_verify": true,
+          "retry_config": {
+            "retry_enabled": false,
+            "max_retries": 0,
+            "retry_interval": 0
+          },
+          "error_strategy": "default-value",
+          "default_value": [
+            {
+              "key": "status_code",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "key": "body",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        }
+      },
+      {
+        "id": "appt_ok",
+        "type": "custom",
+        "position": {
+          "x": 1800,
+          "y": 840
+        },
+        "positionAbsolute": {
+          "x": 1800,
+          "y": 840
+        },
+        "width": 242,
+        "height": 98,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "if-else",
+          "title": "工单是否受理",
+          "desc": "接口 body 含 ticket_id 视为受理成功",
+          "logical_operator": "and",
+          "cases": [
+            {
+              "case_id": "true",
+              "logical_operator": "and",
+              "conditions": [
+                {
+                  "id": "cond-appt_api-body-contains",
+                  "variable_selector": [
+                    "appt_api",
+                    "body"
+                  ],
+                  "comparison_operator": "contains",
+                  "value": "ticket_id",
+                  "varType": "string"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "appt_confirm",
+        "type": "custom",
+        "position": {
+          "x": 2160,
+          "y": 780
+        },
+        "positionAbsolute": {
+          "x": 2160,
+          "y": 780
+        },
+        "width": 242,
+        "height": 160,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "预约成功通知",
+          "desc": "从工单 JSON 取 ticket_id/车型/时间，生成确认话术",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.3
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店销售助理。预约工单接口已返回结果，请生成给客户的确认话术。\n\n规则：\n1. 从接口返回 JSON 中提取：工单号 ticket_id、车型、预约时间、门店。\n2. 明确告诉客户\"预约已提交成功，顾问会在 30 分钟内电话确认\"。\n3. 提醒到店携带：身份证、驾驶证（试驾需要），以及可提前准备的问题。\n4. 绝不要编造接口里没有的工单号、时间或门店名；字段缺失就只说\"已提交，顾问确认后回复您具体安排\"。\n5. 语气热情、简短（120 字以内），结尾祝一句。"
+            },
+            {
+              "role": "user",
+              "text": "客户原话：{{#start.user_query#}}\n工单接口返回（JSON）：\n{{#appt_api.body#}}"
+            }
+          ],
+          "context": {
+            "enabled": false,
+            "variable_selector": []
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "appt_fallback",
+        "type": "custom",
+        "position": {
+          "x": 2160,
+          "y": 1040
+        },
+        "positionAbsolute": {
+          "x": 2160,
+          "y": 1040
+        },
+        "width": 242,
+        "height": 150,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "预约失败兜底",
+          "desc": "预约提交失败时致歉，不谎称成功、不编工单号",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.5
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店销售助理。预约接口提交失败（网络或系统原因），请生成兜底话术。\n\n规则：\n1. 先致歉，说明\"预约系统暂时繁忙，没有提交成功\"。\n2. 不要谎称已经预约成功，不要编造工单号。\n3. 请客户再发一次手机号/时间，或建议直接电话门店/到店登记。\n4. 简短（100 字以内），语气负责。"
+            },
+            {
+              "role": "user",
+              "text": "客户原话：{{#start.user_query#}}"
+            }
+          ],
+          "context": {
+            "enabled": false,
+            "variable_selector": []
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "kb_scripts",
+        "type": "custom",
+        "position": {
+          "x": 720,
+          "y": 1240
+        },
+        "positionAbsolute": {
+          "x": 720,
+          "y": 1240
+        },
+        "width": 242,
+        "height": 140,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "knowledge-retrieval",
+          "title": "话术知识检索",
+          "desc": "汽车销售知识库，多路召回 top_k=3，阈值 0.5",
+          "query_variable_selector": [
+            "start",
+            "user_query"
+          ],
+          "query_attachment_selector": [],
+          "dataset_ids": [
+            "403fbc9d-3c82-4077-8033-6761821f68f3"
+          ],
+          "retrieval_mode": "multiple",
+          "multiple_retrieval_config": {
+            "top_k": 3,
+            "score_threshold": 0.5,
+            "score_threshold_enabled": true,
+            "reranking_enable": false,
+            "reranking_mode": "reranking_model",
+            "reranking_model": null,
+            "weights": null
+          }
+        }
+      },
+      {
+        "id": "objection_reply",
+        "type": "custom",
+        "position": {
+          "x": 1080,
+          "y": 1240
+        },
+        "positionAbsolute": {
+          "x": 1080,
+          "y": 1240
+        },
+        "width": 242,
+        "height": 170,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "异议回复",
+          "desc": "共情 + 价值拆解 + 置换/金融方案，不承诺成交价",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.7
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "你是汽车门店经验丰富的销售顾问，专门处理客户的价格/配置异议。\n\n规则：\n1. 先共情认同（例如\"理解，买车肯定要算清楚\"），不要一上来就反驳。\n2. 用价值拆解回应：把价格拆到配置、用料、续航、质保、用车成本、服务权益上，引用知识库话术里的具体点。\n3. 价格类异议可给两种解法：置换补贴、金融方案（24 期 0 息等），帮客户把落地价算下来；但不能承诺额外降价或编造优惠。\n4. 对比类异议（别家更便宜/网上更便宜）：说明报价口径差异（引流价、捆绑、是否含税险），强调门店报价透明，邀请到店核算。\n5. 不贬低竞品，不说\"网上都是假的\"，不承诺成交价。\n6. 客户没有指明具体车型时（例如只说\"这个车太贵了\"\"能不能便宜点\"）：不要引用任何具体车型的参数（车长、续航、轴距、配置数量），先共情并讲通用价值与政策，再问客户关注的是具体哪一款（如五菱宏光 MINIEV、比亚迪海鸥），避免张冠李戴。\n7. 如果知识库上下文为空：用通用异议处理框架回答，并说明具体政策以门店为准。\n8. 结尾给一个明确下一步：到店对比/试驾/置换评估，并问客户方便时间。\n9. 输出给客户看的自然话术，200 字以内，不要 JSON。"
+            },
+            {
+              "role": "user",
+              "text": "客户原话：{{#start.user_query#}}\n话术库检索结果：\n{{#context#}}"
+            }
+          ],
+          "context": {
+            "enabled": true,
+            "variable_selector": [
+              "kb_scripts",
+              "result"
+            ]
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "smalltalk_reply",
+        "type": "custom",
+        "position": {
+          "x": 720,
+          "y": 1440
+        },
+        "positionAbsolute": {
+          "x": 720,
+          "y": 1440
+        },
+        "width": 242,
+        "height": 120,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "template-transform",
+          "title": "闲聊兜底",
+          "desc": "固定引导话术，不回答无关问题，一句话拉回购车",
+          "template": "您好，我是门店的购车助手 😊\n我主要帮您做三件事：按预算和用车场景推荐车型、查现车和落地价、约试驾。\n您方便说下预算和主要用途吗？比如\"15 万左右，家用，有固定车位\"，我就能帮您筛两台合适的车。",
+          "variables": [
+            {
+              "variable": "query",
+              "value_selector": [
+                "start",
+                "user_query"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "merge_reply",
+        "type": "custom",
+        "position": {
+          "x": 2880,
+          "y": 640
+        },
+        "positionAbsolute": {
+          "x": 2880,
+          "y": 640
+        },
+        "width": 242,
+        "height": 120,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "variable-aggregator",
+          "title": "汇聚回复",
+          "desc": "9 路分支汇聚，取第一个实际有值的变量；最后一路是闲聊兜底",
+          "output_type": "string",
+          "variables": [
+            [
+              "profile_followup",
+              "text"
+            ],
+            [
+              "recommend",
+              "text"
+            ],
+            [
+              "quote_reply",
+              "text"
+            ],
+            [
+              "quote_fallback",
+              "text"
+            ],
+            [
+              "appt_followup",
+              "text"
+            ],
+            [
+              "appt_confirm",
+              "text"
+            ],
+            [
+              "appt_fallback",
+              "text"
+            ],
+            [
+              "objection_reply",
+              "text"
+            ],
+            [
+              "smalltalk_reply",
+              "output"
+            ]
+          ],
+          "advanced_settings": {
+            "group_enabled": false,
+            "groups": []
+          }
+        }
+      },
+      {
+        "id": "compliance_scan",
+        "type": "custom",
+        "position": {
+          "x": 3240,
+          "y": 640
+        },
+        "positionAbsolute": {
+          "x": 3240,
+          "y": 640
+        },
+        "width": 242,
+        "height": 180,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "code",
+          "title": "一级合规扫描",
+          "desc": "内联 level1 硬拦截词库（77 词），命中即拦截；输出 passed / hit_words / text",
+          "code_language": "python3",
+          "code": "import re\n\nLEVEL1_WORDS = [\"终身免费所有服务\", \"坏了直接换新车\", \"100%安全\", \"司机可以睡觉\", \"不会出事故\", \"无任何费用\", \"保证最低价\", \"买贵双倍赔\", \"无理由退车\", \"无与伦比\", \"全网第一\", \"销量冠军\", \"全球第一\", \"行业第一\", \"100%\", \"永不故障\", \"永不自燃\", \"绝对安全\", \"永不失控\", \"保命神车\", \"万无一失\", \"铜墙铁壁\", \"自动驾驶\", \"无人驾驶\", \"解放双手\", \"不用开车\", \"自动避险\", \"脱手脱脚\", \"完全自动\", \"无人操控\", \"脱手开车\", \"稳赚不赔\", \"保本增值\", \"买车理财\", \"强制消费\", \"捆绑销售\", \"保证上牌\", \"内部渠道\", \"偷税漏税\", \"虚开发票\", \"人身攻击\", \"最安全\", \"最省油\", \"最便宜\", \"最低价\", \"国家级\", \"最高级\", \"世界级\", \"百分百\", \"撞不坏\", \"零首付\", \"零利息\", \"零成本\", \"包赚钱\", \"零月供\", \"包过审\", \"走后门\", \"垃圾车\", \"最佳\", \"最好\", \"最优\", \"最强\", \"顶级\", \"顶尖\", \"极致\", \"完美\", \"秒杀\", \"碾压\", \"吊打\", \"完爆\", \"永不\", \"绝对\", \"彻底\", \"根治\", \"辱骂\", \"造谣\", \"抹黑\"]\n\n\ndef _normalize(text):\n    value = (text or \"\").lower()\n    value = value.replace(\"％\", \"%\").replace(\"　\", \"\")\n    return re.sub(r\"\\s+\", \"\", value)\n\n\ndef main(text: str) -> dict:\n    \"\"\"一级硬拦截扫词：命中任一 level1 词即 passed=False。\"\"\"\n    raw = text or \"\"\n    compact = _normalize(raw)\n    hits = []\n    for word in LEVEL1_WORDS:\n        normalized = _normalize(word)\n        if normalized and normalized in compact:\n            hits.append(word)\n    return {\n        \"passed\": len(hits) == 0,\n        \"hit_words\": \"，\".join(hits[:10]),\n        \"text\": raw,\n    }\n",
+          "variables": [
+            {
+              "variable": "text",
+              "value_selector": [
+                "merge_reply",
+                "output"
+              ],
+              "value_type": "string"
+            }
+          ],
+          "outputs": {
+            "passed": {
+              "type": "boolean",
+              "children": null
+            },
+            "hit_words": {
+              "type": "string",
+              "children": null
+            },
+            "text": {
+              "type": "string",
+              "children": null
+            }
+          }
+        }
+      },
+      {
+        "id": "compliance_if",
+        "type": "custom",
+        "position": {
+          "x": 3600,
+          "y": 640
+        },
+        "positionAbsolute": {
+          "x": 3600,
+          "y": 640
+        },
+        "width": 242,
+        "height": 98,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "if-else",
+          "title": "一级是否通过",
+          "desc": "passed == true 进 LLM 二级校验；false 直接走一级拦截兜底",
+          "logical_operator": "and",
+          "cases": [
+            {
+              "case_id": "true",
+              "logical_operator": "and",
+              "conditions": [
+                {
+                  "id": "cond-compliance_scan-passed-is",
+                  "variable_selector": [
+                    "compliance_scan",
+                    "passed"
+                  ],
+                  "comparison_operator": "is",
+                  "value": true,
+                  "varType": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "compliance_llm",
+        "type": "custom",
+        "position": {
+          "x": 3960,
+          "y": 500
+        },
+        "positionAbsolute": {
+          "x": 3960,
+          "y": 500
+        },
+        "width": 242,
+        "height": 170,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "llm",
+          "title": "二级合规修正",
+          "desc": "按 compliance_words.json 的合规 Prompt 审核并修正回答；只输出最终文本",
+          "model": {
+            "provider": "langgenius/deepseek/deepseek",
+            "name": "deepseek-flash",
+            "mode": "chat",
+            "completion_params": {
+              "temperature": 0.1
+            }
+          },
+          "model_selector": null,
+          "prompt_template": [
+            {
+              "role": "system",
+              "text": "角色：汽车销售合规审核员\n任务：审核并修正汽车销售回答内容，确保符合《广告法》与行业宣传规范。\n\n审核规则：\n1. 绝对化用词处理：删除所有“最、第一、顶级、唯一、100%、永不、绝对”等极限用词，替换为客观描述，例如“同级别中表现较为出色”。\n2. 智能驾驶合规：L2/L2+级只能称为“智能辅助驾驶”，严禁出现“自动驾驶、无人驾驶、解放双手”等表述；必须补充说明“驾驶员需全程把控车辆安全”。\n3. 续航与质保：续航必须标注工况标准，补充“实际续航受气温、驾驶习惯影响会有浮动”；质保、终身权益必须补充前提条件，如“首任非营运车主，以厂家官方条款为准”。\n4. 金融宣传：免息、低首付必须说明适用条件，不得出现无前提的“零首付、零利息”表述。\n5. 竞品评价：不得贬低任何竞品品牌，仅客观陈述差异；删除所有恶意贬低、造谣类表述。\n6. 语气规范：专业友好，不得出现攻击性、诱导性违规话术，不得虚假承诺。\n\n输出要求：\n- 内容需要修正：直接输出修正后的完整回答。\n- 内容完全合规：直接输出原文，不做任何修改。\n- 如内容存在重大违规且无法自动修正：只输出这句兜底话术——以上信息仅供参考，具体车辆参数、优惠政策与服务详情请以门店官方公示为准，建议您到店咨询专业销售顾问。\n- 仅输出最终文本，不要解释、不要标注修改点、不要额外说明。\n\n待审核内容：\n{{#compliance_scan.text#}}"
+            },
+            {
+              "role": "user",
+              "text": "请审核上面的待审核内容。需要修正则直接输出修正后的完整回答，合规则原样输出，无法修正则只输出兜底话术。"
+            }
+          ],
+          "context": {
+            "enabled": false,
+            "variable_selector": []
+          },
+          "vision": {
+            "enabled": false
+          },
+          "reasoning_format": "separated"
+        }
+      },
+      {
+        "id": "compliance_verify",
+        "type": "custom",
+        "position": {
+          "x": 4320,
+          "y": 500
+        },
+        "positionAbsolute": {
+          "x": 4320,
+          "y": 500
+        },
+        "width": 242,
+        "height": 200,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "code",
+          "title": "二级合规复核",
+          "desc": "再扫 level1 残留 + 判定 LLM 是否直接回兜底话术；输出 passed2 / final_text / verify_flag",
+          "code_language": "python3",
+          "code": "import re\n\nLEVEL1_WORDS = [\"终身免费所有服务\", \"坏了直接换新车\", \"100%安全\", \"司机可以睡觉\", \"不会出事故\", \"无任何费用\", \"保证最低价\", \"买贵双倍赔\", \"无理由退车\", \"无与伦比\", \"全网第一\", \"销量冠军\", \"全球第一\", \"行业第一\", \"100%\", \"永不故障\", \"永不自燃\", \"绝对安全\", \"永不失控\", \"保命神车\", \"万无一失\", \"铜墙铁壁\", \"自动驾驶\", \"无人驾驶\", \"解放双手\", \"不用开车\", \"自动避险\", \"脱手脱脚\", \"完全自动\", \"无人操控\", \"脱手开车\", \"稳赚不赔\", \"保本增值\", \"买车理财\", \"强制消费\", \"捆绑销售\", \"保证上牌\", \"内部渠道\", \"偷税漏税\", \"虚开发票\", \"人身攻击\", \"最安全\", \"最省油\", \"最便宜\", \"最低价\", \"国家级\", \"最高级\", \"世界级\", \"百分百\", \"撞不坏\", \"零首付\", \"零利息\", \"零成本\", \"包赚钱\", \"零月供\", \"包过审\", \"走后门\", \"垃圾车\", \"最佳\", \"最好\", \"最优\", \"最强\", \"顶级\", \"顶尖\", \"极致\", \"完美\", \"秒杀\", \"碾压\", \"吊打\", \"完爆\", \"永不\", \"绝对\", \"彻底\", \"根治\", \"辱骂\", \"造谣\", \"抹黑\"]\nUNFIXABLE_MARKER = \"以上信息仅供参考\"\n\n\ndef _normalize(text):\n    value = (text or \"\").lower()\n    value = value.replace(\"％\", \"%\").replace(\"　\", \"\")\n    return re.sub(r\"\\s+\", \"\", value)\n\n\ndef main(llm_text: str, original_text: str) -> dict:\n    \"\"\"二级复核：LLM 修正后的文本不得再含 level1 词；若 LLM 整段返回兜底话术则判不可修正。\"\"\"\n    raw = (llm_text or \"\").strip()\n    raw = re.sub(r\"<think>.*?</think>\", \"\", raw, flags=re.S).strip()\n    compact = _normalize(raw)\n    hits = []\n    for word in LEVEL1_WORDS:\n        normalized = _normalize(word)\n        if normalized and normalized in compact:\n            hits.append(word)\n    # 仅当整段就是兜底话术时才判不可修正：正常回答末尾顺带一句“以上信息仅供参考…”不算。\n    bare = re.sub(r\"\\s+\", \"\", raw)\n    marker = re.sub(r\"\\s+\", \"\", UNFIXABLE_MARKER)\n    is_fallback = bare.startswith(marker) and len(bare) <= 140\n    passed2 = (len(hits) == 0) and (not is_fallback)\n    flag = \"passed\" if (original_text or \"\").strip() == raw else \"llm_fixed\"\n    return {\n        \"passed2\": passed2,\n        \"final_text\": raw,\n        \"hit_words2\": \"，\".join(hits[:10]),\n        \"verify_flag\": flag,\n    }\n",
+          "variables": [
+            {
+              "variable": "llm_text",
+              "value_selector": [
+                "compliance_llm",
+                "text"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "original_text",
+              "value_selector": [
+                "compliance_scan",
+                "text"
+              ],
+              "value_type": "string"
+            }
+          ],
+          "outputs": {
+            "passed2": {
+              "type": "boolean",
+              "children": null
+            },
+            "final_text": {
+              "type": "string",
+              "children": null
+            },
+            "hit_words2": {
+              "type": "string",
+              "children": null
+            },
+            "verify_flag": {
+              "type": "string",
+              "children": null
+            }
+          }
+        }
+      },
+      {
+        "id": "compliance_if2",
+        "type": "custom",
+        "position": {
+          "x": 4680,
+          "y": 500
+        },
+        "positionAbsolute": {
+          "x": 4680,
+          "y": 500
+        },
+        "width": 242,
+        "height": 98,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "if-else",
+          "title": "二级是否通过",
+          "desc": "passed2 == true 放行修正稿；false 走不可修正兜底话术",
+          "logical_operator": "and",
+          "cases": [
+            {
+              "case_id": "true",
+              "logical_operator": "and",
+              "conditions": [
+                {
+                  "id": "cond-compliance_verify-passed2-is",
+                  "variable_selector": [
+                    "compliance_verify",
+                    "passed2"
+                  ],
+                  "comparison_operator": "is",
+                  "value": true,
+                  "varType": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "compliance_fallback",
+        "type": "custom",
+        "position": {
+          "x": 3960,
+          "y": 760
+        },
+        "positionAbsolute": {
+          "x": 3960,
+          "y": 760
+        },
+        "width": 242,
+        "height": 120,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "template-transform",
+          "title": "一级拦截兜底",
+          "desc": "level1 命中时的标准话术（fallback.hit_level1），不进入 LLM",
+          "template": "抱歉，相关表述不符合广告宣传规范，具体车辆参数、优惠政策与服务条款请以门店官方公示为准，欢迎您到店详细咨询销售顾问。",
+          "variables": []
+        }
+      },
+      {
+        "id": "compliance_fallback2",
+        "type": "custom",
+        "position": {
+          "x": 5040,
+          "y": 760
+        },
+        "positionAbsolute": {
+          "x": 5040,
+          "y": 760
+        },
+        "width": 242,
+        "height": 120,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "template-transform",
+          "title": "不可修正兜底",
+          "desc": "LLM 修正后仍违规/无法修正时的标准话术（fallback.llm_unfixable）",
+          "template": "以上信息仅供参考，具体车辆参数、优惠政策与服务详情请以门店官方公示为准，建议您到店咨询专业销售顾问。",
+          "variables": []
+        }
+      },
+      {
+        "id": "compliance_finalize",
+        "type": "custom",
+        "position": {
+          "x": 5400,
+          "y": 640
+        },
+        "positionAbsolute": {
+          "x": 5400,
+          "y": 640
+        },
+        "width": 242,
+        "height": 200,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "code",
+          "title": "合规结果汇聚",
+          "desc": "四条合规路径的唯一出口：输出 response 与 compliance_flag",
+          "code_language": "python3",
+          "code": "FALLBACK_TEXT = \"抱歉，相关表述不符合广告宣传规范，具体车辆参数、优惠政策与服务条款请以门店官方公示为准，欢迎您到店详细咨询销售顾问。\"\n\n\ndef main(fallback_text: str, unfixable_text: str, fixed_text: str, verify_flag: str) -> dict:\n    \"\"\"合规链路唯一出口：按实际执行到的分支给出最终文本与合规标记。\n\n    未执行分支的变量为 None/空串；判定顺序：三级兜底 > LLM 修正稿 > 一级拦截兜底。\n    \"\"\"\n    fallback_text = (fallback_text or \"\").strip()\n    unfixable_text = (unfixable_text or \"\").strip()\n    fixed_text = (fixed_text or \"\").strip()\n    if unfixable_text:\n        return {\"response\": unfixable_text, \"compliance_flag\": \"llm_unfixed\"}\n    if fixed_text:\n        return {\"response\": fixed_text, \"compliance_flag\": verify_flag or \"passed\"}\n    if fallback_text:\n        return {\"response\": fallback_text, \"compliance_flag\": \"blocked_level1\"}\n    return {\"response\": FALLBACK_TEXT, \"compliance_flag\": \"blocked_level1\"}\n",
+          "variables": [
+            {
+              "variable": "fallback_text",
+              "value_selector": [
+                "compliance_fallback",
+                "output"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "unfixable_text",
+              "value_selector": [
+                "compliance_fallback2",
+                "output"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "fixed_text",
+              "value_selector": [
+                "compliance_verify",
+                "final_text"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "verify_flag",
+              "value_selector": [
+                "compliance_verify",
+                "verify_flag"
+              ],
+              "value_type": "string"
+            }
+          ],
+          "outputs": {
+            "response": {
+              "type": "string",
+              "children": null
+            },
+            "compliance_flag": {
+              "type": "string",
+              "children": null
+            }
+          }
+        }
+      },
+      {
+        "id": "sources_attach",
+        "type": "custom",
+        "position": {
+          "x": 5580,
+          "y": 640
+        },
+        "positionAbsolute": {
+          "x": 5580,
+          "y": 640
+        },
+        "width": 242,
+        "height": 200,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "code",
+          "title": "检索来源附注",
+          "desc": "在回答末尾追加命中的知识库片段（文档名 / 相关度 / 摘要），并输出结构化 sources",
+          "code_language": "python3",
+          "code": "import json\n\n\ndef main(response: str, compliance_flag: str, kb_models: list, kb_scripts: list) -> dict:\n    \"\"\"在最终回答末尾追加本次命中的知识库片段，并输出结构化 sources。\n\n    只在 passed / llm_fixed 时追加；一级拦截或不可修正兜底不追加，避免把命中内容带出去。\n    \"\"\"\n    text = (response or \"\").strip()\n    flag = compliance_flag or \"\"\n    rows = []\n    seen = set()\n    for items in (kb_models or [], kb_scripts or []):\n        if not isinstance(items, list):\n            continue\n        for it in items:\n            if not isinstance(it, dict):\n                continue\n            content = \" \".join(str(it.get(\"content\") or \"\").split())\n            if not content:\n                continue\n            meta = it.get(\"metadata\") or {}\n            if not isinstance(meta, dict):\n                meta = {}\n            doc = it.get(\"title\") or meta.get(\"document_name\") or meta.get(\"doc_id\") or \"知识库文档\"\n            raw_score = it.get(\"score\")\n            if raw_score is None:\n                raw_score = meta.get(\"score\")\n            try:\n                score_text = f\"{float(raw_score):.2f}\"\n            except (TypeError, ValueError):\n                score_text = \"-\"\n            key = (str(doc), content[:40])\n            if key in seen:\n                continue\n            seen.add(key)\n            rows.append({\"document\": str(doc), \"score\": score_text, \"snippet\": content[:90]})\n            if len(rows) >= 3:\n                break\n        if len(rows) >= 3:\n            break\n    if not rows or flag not in (\"passed\", \"llm_fixed\"):\n        return {\"response\": text, \"sources\": \"\", \"compliance_flag\": flag}\n    lines = [\"\", \"\", \"---\", \"参考来源（知识库检索，非实时价格/库存）：\"]\n    for i, row in enumerate(rows, 1):\n        lines.append(f\"{i}. {row['document']} · 相关度 {row['score']} · {row['snippet']}\")\n    return {\n        \"response\": text + \"\\n\".join(lines),\n        \"sources\": json.dumps(rows, ensure_ascii=False),\n        \"compliance_flag\": flag,\n    }\n",
+          "variables": [
+            {
+              "variable": "response",
+              "value_selector": [
+                "compliance_finalize",
+                "response"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "compliance_flag",
+              "value_selector": [
+                "compliance_finalize",
+                "compliance_flag"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "kb_models",
+              "value_selector": [
+                "kb_models",
+                "result"
+              ],
+              "value_type": "array[object]"
+            },
+            {
+              "variable": "kb_scripts",
+              "value_selector": [
+                "kb_scripts",
+                "result"
+              ],
+              "value_type": "array[object]"
+            }
+          ],
+          "outputs": {
+            "response": {
+              "type": "string",
+              "children": null
+            },
+            "sources": {
+              "type": "string",
+              "children": null
+            },
+            "compliance_flag": {
+              "type": "string",
+              "children": null
+            }
+          }
+        }
+      },
+      {
+        "id": "end",
+        "type": "custom",
+        "position": {
+          "x": 5760,
+          "y": 640
+        },
+        "positionAbsolute": {
+          "x": 5760,
+          "y": 640
+        },
+        "width": 242,
+        "height": 120,
+        "selected": false,
+        "sourcePosition": "right",
+        "targetPosition": "left",
+        "zIndex": 0,
+        "data": {
+          "selected": false,
+          "type": "end",
+          "title": "结束",
+          "desc": "输出合规后的 response（含知识库来源附注）、结构化 sources，以及便于统计的 compliance_flag",
+          "outputs": [
+            {
+              "variable": "response",
+              "value_selector": [
+                "sources_attach",
+                "response"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "sources",
+              "value_selector": [
+                "sources_attach",
+                "sources"
+              ],
+              "value_type": "string"
+            },
+            {
+              "variable": "compliance_flag",
+              "value_selector": [
+                "sources_attach",
+                "compliance_flag"
+              ],
+              "value_type": "string"
+            }
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "start-source-intent_classifier-target",
+        "source": "start",
+        "sourceHandle": "source",
+        "target": "intent_classifier",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "start",
+          "targetType": "question-classifier",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "intent_classifier-1-profile_extract-target",
+        "source": "intent_classifier",
+        "sourceHandle": "1",
+        "target": "profile_extract",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "question-classifier",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "intent_classifier-2-quote_extract-target",
+        "source": "intent_classifier",
+        "sourceHandle": "2",
+        "target": "quote_extract",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "question-classifier",
+          "targetType": "parameter-extractor",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "intent_classifier-3-appt_extract-target",
+        "source": "intent_classifier",
+        "sourceHandle": "3",
+        "target": "appt_extract",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "question-classifier",
+          "targetType": "parameter-extractor",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "intent_classifier-4-kb_scripts-target",
+        "source": "intent_classifier",
+        "sourceHandle": "4",
+        "target": "kb_scripts",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "question-classifier",
+          "targetType": "knowledge-retrieval",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "intent_classifier-5-smalltalk_reply-target",
+        "source": "intent_classifier",
+        "sourceHandle": "5",
+        "target": "smalltalk_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "question-classifier",
+          "targetType": "template-transform",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "profile_extract-source-profile_parse-target",
+        "source": "profile_extract",
+        "sourceHandle": "source",
+        "target": "profile_parse",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "code",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "profile_parse-source-profile_check-target",
+        "source": "profile_parse",
+        "sourceHandle": "source",
+        "target": "profile_check",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "code",
+          "targetType": "if-else",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "profile_check-true-kb_query_build-target",
+        "source": "profile_check",
+        "sourceHandle": "true",
+        "target": "kb_query_build",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "template-transform",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "profile_check-false-profile_followup-target",
+        "source": "profile_check",
+        "sourceHandle": "false",
+        "target": "profile_followup",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "kb_query_build-source-kb_models-target",
+        "source": "kb_query_build",
+        "sourceHandle": "source",
+        "target": "kb_models",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "template-transform",
+          "targetType": "knowledge-retrieval",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "kb_models-source-recommend-target",
+        "source": "kb_models",
+        "sourceHandle": "source",
+        "target": "recommend",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "knowledge-retrieval",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "quote_extract-source-inventory_api-target",
+        "source": "quote_extract",
+        "sourceHandle": "source",
+        "target": "inventory_api",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "parameter-extractor",
+          "targetType": "http-request",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "inventory_api-source-inventory_ok-target",
+        "source": "inventory_api",
+        "sourceHandle": "source",
+        "target": "inventory_ok",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "http-request",
+          "targetType": "if-else",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "inventory_ok-true-quote_reply-target",
+        "source": "inventory_ok",
+        "sourceHandle": "true",
+        "target": "quote_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "inventory_ok-false-quote_fallback-target",
+        "source": "inventory_ok",
+        "sourceHandle": "false",
+        "target": "quote_fallback",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_extract-source-appt_complete-target",
+        "source": "appt_extract",
+        "sourceHandle": "source",
+        "target": "appt_complete",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "parameter-extractor",
+          "targetType": "if-else",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_complete-true-appt_api-target",
+        "source": "appt_complete",
+        "sourceHandle": "true",
+        "target": "appt_api",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "http-request",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_complete-false-appt_followup-target",
+        "source": "appt_complete",
+        "sourceHandle": "false",
+        "target": "appt_followup",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_api-source-appt_ok-target",
+        "source": "appt_api",
+        "sourceHandle": "source",
+        "target": "appt_ok",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "http-request",
+          "targetType": "if-else",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_ok-true-appt_confirm-target",
+        "source": "appt_ok",
+        "sourceHandle": "true",
+        "target": "appt_confirm",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_ok-false-appt_fallback-target",
+        "source": "appt_ok",
+        "sourceHandle": "false",
+        "target": "appt_fallback",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "kb_scripts-source-objection_reply-target",
+        "source": "kb_scripts",
+        "sourceHandle": "source",
+        "target": "objection_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "knowledge-retrieval",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "profile_followup-source-merge_reply-target",
+        "source": "profile_followup",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "recommend-source-merge_reply-target",
+        "source": "recommend",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "quote_reply-source-merge_reply-target",
+        "source": "quote_reply",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "quote_fallback-source-merge_reply-target",
+        "source": "quote_fallback",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_followup-source-merge_reply-target",
+        "source": "appt_followup",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_confirm-source-merge_reply-target",
+        "source": "appt_confirm",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "appt_fallback-source-merge_reply-target",
+        "source": "appt_fallback",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "objection_reply-source-merge_reply-target",
+        "source": "objection_reply",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "smalltalk_reply-source-merge_reply-target",
+        "source": "smalltalk_reply",
+        "sourceHandle": "source",
+        "target": "merge_reply",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "template-transform",
+          "targetType": "variable-aggregator",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "merge_reply-source-compliance_scan-target",
+        "source": "merge_reply",
+        "sourceHandle": "source",
+        "target": "compliance_scan",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "variable-aggregator",
+          "targetType": "code",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_scan-source-compliance_if-target",
+        "source": "compliance_scan",
+        "sourceHandle": "source",
+        "target": "compliance_if",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "code",
+          "targetType": "if-else",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_if-true-compliance_llm-target",
+        "source": "compliance_if",
+        "sourceHandle": "true",
+        "target": "compliance_llm",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "llm",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_if-false-compliance_fallback-target",
+        "source": "compliance_if",
+        "sourceHandle": "false",
+        "target": "compliance_fallback",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "template-transform",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_llm-source-compliance_verify-target",
+        "source": "compliance_llm",
+        "sourceHandle": "source",
+        "target": "compliance_verify",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "llm",
+          "targetType": "code",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_verify-source-compliance_if2-target",
+        "source": "compliance_verify",
+        "sourceHandle": "source",
+        "target": "compliance_if2",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "code",
+          "targetType": "if-else",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_if2-true-compliance_finalize-target",
+        "source": "compliance_if2",
+        "sourceHandle": "true",
+        "target": "compliance_finalize",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "code",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_if2-false-compliance_fallback2-target",
+        "source": "compliance_if2",
+        "sourceHandle": "false",
+        "target": "compliance_fallback2",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "if-else",
+          "targetType": "template-transform",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_fallback-source-compliance_finalize-target",
+        "source": "compliance_fallback",
+        "sourceHandle": "source",
+        "target": "compliance_finalize",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "template-transform",
+          "targetType": "code",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_fallback2-source-compliance_finalize-target",
+        "source": "compliance_fallback2",
+        "sourceHandle": "source",
+        "target": "compliance_finalize",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "template-transform",
+          "targetType": "code",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "compliance_finalize-source-sources_attach-target",
+        "source": "compliance_finalize",
+        "sourceHandle": "source",
+        "target": "sources_attach",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "code",
+          "targetType": "code",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      },
+      {
+        "id": "sources_attach-source-end-target",
+        "source": "sources_attach",
+        "sourceHandle": "source",
+        "target": "end",
+        "targetHandle": "target",
+        "type": "custom",
+        "selected": false,
+        "zIndex": 0,
+        "data": {
+          "sourceType": "code",
+          "targetType": "end",
+          "isInIteration": false,
+          "isInLoop": false,
+          "iteration_id": null,
+          "loop_id": null
+        }
+      }
+    ],
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "zoom": 0.7
+    }
+  },
+  "features": {
+    "file_upload": {},
+    "retriever_resource": {
+      "enabled": true
+    },
+    "sensitive_word_avoidance": {
+      "enabled": false
+    },
+    "text_to_speech": {
+      "enabled": false,
+      "language": "",
+      "voice": ""
+    }
+  },
+  "hash": null,
+  "conversation_variables": []
+}

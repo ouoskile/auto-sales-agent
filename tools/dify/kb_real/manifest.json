@@ -1,0 +1,419 @@
+{
+  "dataset_id": "403fbc9d-3c82-4077-8033-6761821f68f3",
+  "generated_at": "2026-11-17T17:55:23+08:00",
+  "kb_dir": "docs/dify/knowledge_real",
+  "indexing_technique": "high_quality",
+  "doc_form": "text_model",
+  "note": "documents 初始为空，由 tools/dify/import_kb.py 回填；导入命令：python tools/dify/import_kb.py --kb-dir docs/dify/knowledge_real --manifest tools/dify/kb_real/manifest.json",
+  "documents": [
+    {
+      "name": "01_微型入门代步与紧凑型轿车.md",
+      "file_id": "a9ca67ab-bf87-4cbe-8a8f-2bef1a61d281",
+      "document_id": "a73e98ff-2bd3-4f4d-8e90-1d9c84b5d594",
+      "source": "docs\\dify\\knowledge_real\\01_微型入门代步与紧凑型轿车.md"
+    },
+    {
+      "name": "02_中型轿车与紧凑型SUV.md",
+      "file_id": "ba4d5947-9fa0-42e6-aba0-2d9270d41409",
+      "document_id": "3fe33a45-7c7a-4a92-9c63-6875328933b5",
+      "source": "docs\\dify\\knowledge_real\\02_中型轿车与紧凑型SUV.md"
+    },
+    {
+      "name": "03_中大型SUV与MPV.md",
+      "file_id": "912bc55a-5161-4b1b-8d1e-82fa3dec6def",
+      "document_id": "effb9706-1443-46c7-bb6b-a930dd5a5696",
+      "source": "docs\\dify\\knowledge_real\\03_中大型SUV与MPV.md"
+    },
+    {
+      "name": "04_高端特色代表.md",
+      "file_id": "6a26d530-14a4-41a0-9482-fa6b118cbf6a",
+      "document_id": "e7bc6d8a-d34f-4812-b574-64f70bc1bd1b",
+      "source": "docs\\dify\\knowledge_real\\04_高端特色代表.md"
+    },
+    {
+      "name": "05_购车基础与三电.md",
+      "file_id": "6ef2d96c-1388-4f4b-aa2e-51163e99f987",
+      "document_id": "f7e9603c-2e12-4340-b047-a8be9232819c",
+      "source": "docs\\dify\\knowledge_real\\05_购车基础与三电.md"
+    },
+    {
+      "name": "06_智能驾驶与座舱.md",
+      "file_id": "b20dbaea-21de-4873-b7f6-fe1cf0a96c68",
+      "document_id": "743aa3ae-15aa-4716-9de5-c70c076a782d",
+      "source": "docs\\dify\\knowledge_real\\06_智能驾驶与座舱.md"
+    },
+    {
+      "name": "07_价格交易与权益保险.md",
+      "file_id": "49312c16-cdea-4330-b46c-c0fae1110b18",
+      "document_id": "a7ec1ca7-fc5e-4b5a-9edb-c5b08e881499",
+      "source": "docs\\dify\\knowledge_real\\07_价格交易与权益保险.md"
+    },
+    {
+      "name": "08_需求分析与产品介绍.md",
+      "file_id": "81eb4048-96a9-4040-acae-53b6f5330f27",
+      "document_id": "72295289-556c-4c54-b44d-29ff6429180b",
+      "source": "docs\\dify\\knowledge_real\\08_需求分析与产品介绍.md"
+    },
+    {
+      "name": "09_客户跟进与竞品对比.md",
+      "file_id": "4e4597cd-ada5-4881-aa06-3b16e5fc3970",
+      "document_id": "1f5a0985-98d1-4081-9f5c-510e2fb6765a",
+      "source": "docs\\dify\\knowledge_real\\09_客户跟进与竞品对比.md"
+    }
+  ],
+  "plan": [
+    {
+      "name": "01_微型入门代步与紧凑型轿车.md",
+      "path": "docs/dify/knowledge_real/01_微型入门代步与紧凑型轿车.md",
+      "category": "车型库",
+      "source_files": [
+        "txt/现有汽车/现有汽车类型及销售要点.txt"
+      ],
+      "keywords": [
+        "车型库",
+        "指导价",
+        "参数",
+        "配置",
+        "卖点",
+        "FABE",
+        "续航",
+        "动力",
+        "竞品",
+        "五菱宏光 MINIEV",
+        "吉利银河星愿",
+        "比亚迪海鸥",
+        "零跑 A10",
+        "比亚迪秦 PLUS DM-i",
+        "大众朗逸",
+        "丰田卡罗拉",
+        "日产轩逸",
+        "比亚迪海豹 06",
+        "小米 SU7"
+      ],
+      "import_order": 1,
+      "chars": 4638,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "车型库",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    },
+    {
+      "name": "02_中型轿车与紧凑型SUV.md",
+      "path": "docs/dify/knowledge_real/02_中型轿车与紧凑型SUV.md",
+      "category": "车型库",
+      "source_files": [
+        "txt/现有汽车/现有汽车类型及销售要点.txt"
+      ],
+      "keywords": [
+        "车型库",
+        "指导价",
+        "参数",
+        "配置",
+        "卖点",
+        "FABE",
+        "续航",
+        "动力",
+        "竞品",
+        "丰田凯美瑞",
+        "本田雅阁",
+        "比亚迪汉 EV",
+        "大众帕萨特",
+        "比亚迪元 UP",
+        "比亚迪宋 Pro DM-i",
+        "哈弗 H6",
+        "吉利星越 L",
+        "本田 CR-V",
+        "长安 CS75 PLUS"
+      ],
+      "import_order": 2,
+      "chars": 4647,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "车型库",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    },
+    {
+      "name": "03_中大型SUV与MPV.md",
+      "path": "docs/dify/knowledge_real/03_中大型SUV与MPV.md",
+      "category": "车型库",
+      "source_files": [
+        "txt/现有汽车/现有汽车类型及销售要点.txt"
+      ],
+      "keywords": [
+        "车型库",
+        "指导价",
+        "参数",
+        "配置",
+        "卖点",
+        "FABE",
+        "续航",
+        "动力",
+        "竞品",
+        "特斯拉 Model Y",
+        "理想 L6",
+        "问界 M7",
+        "丰田汉兰达",
+        "宝马 X5",
+        "别克 GL8",
+        "腾势 D9",
+        "传祺 M8"
+      ],
+      "import_order": 3,
+      "chars": 3775,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "车型库",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    },
+    {
+      "name": "04_高端特色代表.md",
+      "path": "docs/dify/knowledge_real/04_高端特色代表.md",
+      "category": "车型库",
+      "source_files": [
+        "txt/现有汽车/现有汽车类型及销售要点.txt"
+      ],
+      "keywords": [
+        "车型库",
+        "指导价",
+        "参数",
+        "配置",
+        "卖点",
+        "FABE",
+        "续航",
+        "动力",
+        "竞品",
+        "蔚来 ES6",
+        "保时捷 Macan"
+      ],
+      "import_order": 4,
+      "chars": 1164,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "车型库",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    },
+    {
+      "name": "05_购车基础与三电.md",
+      "path": "docs/dify/knowledge_real/05_购车基础与三电.md",
+      "category": "术语",
+      "source_files": [
+        "销售话术/01 - 轿车级别划分.txt",
+        "销售话术/02-SUV 级别划分.txt",
+        "销售话术/03 - 车身结构分类.txt",
+        "销售话术/04 - 驱动形式术语.txt",
+        "销售话术/05 - 核心尺寸参数术语.txt",
+        "销售话术/06 - 燃油发动机核心术语.txt",
+        "销售话术/07 - 变速箱术语.txt",
+        "销售话术/08 - 新能源动力分类术语.txt",
+        "销售话术/09 - 三电系统核心术语.txt",
+        "销售话术/10 - 续航与补能术语.txt",
+        "销售话术/11 - 悬挂系统术语.txt",
+        "销售话术/12 - 转向与制动术语.txt",
+        "销售话术/13 - 车身稳定系统术语.txt"
+      ],
+      "keywords": [
+        "术语",
+        "定义",
+        "专业名词",
+        "客户答疑",
+        "01 - 轿车级别划分",
+        "02-SUV 级别划分",
+        "03 - 车身结构分类",
+        "04 - 驱动形式术语",
+        "05 - 核心尺寸参数术语",
+        "06 - 燃油发动机核心术语",
+        "07 - 变速箱术语",
+        "08 - 新能源动力分类术语",
+        "09 - 三电系统核心术语",
+        "10 - 续航与补能术语",
+        "11 - 悬挂系统术语",
+        "12 - 转向与制动术语",
+        "13 - 车身稳定系统术语"
+      ],
+      "import_order": 5,
+      "chars": 24792,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "术语",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    },
+    {
+      "name": "06_智能驾驶与座舱.md",
+      "path": "docs/dify/knowledge_real/06_智能驾驶与座舱.md",
+      "category": "术语",
+      "source_files": [
+        "销售话术/14 - 智能驾驶分级术语.txt",
+        "销售话术/15 - 辅助驾驶功能术语..txt",
+        "销售话术/16 - 智能座舱术语.txt"
+      ],
+      "keywords": [
+        "术语",
+        "定义",
+        "专业名词",
+        "客户答疑",
+        "14 - 智能驾驶分级术语",
+        "15 - 辅助驾驶功能术语.",
+        "16 - 智能座舱术语"
+      ],
+      "import_order": 6,
+      "chars": 7843,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "术语",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    },
+    {
+      "name": "07_价格交易与权益保险.md",
+      "path": "docs/dify/knowledge_real/07_价格交易与权益保险.md",
+      "category": "术语",
+      "source_files": [
+        "销售话术/17 - 价格体系术语.txt",
+        "销售话术/18 - 车辆状态术语.txt",
+        "销售话术/19 - 交易流程术语.txt",
+        "销售话术/20 - 权益与质保术语.txt",
+        "销售话术/21 - 贷款方案术语.txt",
+        "销售话术/22 - 保险术语.txt",
+        "销售话术/23 - 售后与维保术语.txt"
+      ],
+      "keywords": [
+        "术语",
+        "定义",
+        "专业名词",
+        "客户答疑",
+        "17 - 价格体系术语",
+        "18 - 车辆状态术语",
+        "19 - 交易流程术语",
+        "20 - 权益与质保术语",
+        "21 - 贷款方案术语",
+        "22 - 保险术语",
+        "23 - 售后与维保术语"
+      ],
+      "import_order": 7,
+      "chars": 18557,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "术语",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    },
+    {
+      "name": "08_需求分析与产品介绍.md",
+      "path": "docs/dify/knowledge_real/08_需求分析与产品介绍.md",
+      "category": "方法论",
+      "source_files": [
+        "需求咨询/24 - 需求分析方法.txt",
+        "需求咨询/25 - 产品介绍方法.txt"
+      ],
+      "keywords": [
+        "销售方法",
+        "话术",
+        "需求分析",
+        "产品介绍",
+        "异议处理",
+        "竞品对比",
+        "客户跟进"
+      ],
+      "import_order": 8,
+      "chars": 5673,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "方法论",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    },
+    {
+      "name": "09_客户跟进与竞品对比.md",
+      "path": "docs/dify/knowledge_real/09_客户跟进与竞品对比.md",
+      "category": "方法论",
+      "source_files": [
+        "需求咨询/26 - 客户跟进与转化术语.txt",
+        "需求咨询/27 - 竞品对比与市场术语.txt"
+      ],
+      "keywords": [
+        "销售方法",
+        "话术",
+        "需求分析",
+        "产品介绍",
+        "异议处理",
+        "竞品对比",
+        "客户跟进"
+      ],
+      "import_order": 9,
+      "chars": 6667,
+      "suggested_chunk": {
+        "mode": "automatic",
+        "max_tokens": 500,
+        "overlap_tokens": 50,
+        "separator": "\n\n"
+      },
+      "metadata": {
+        "category": "方法论",
+        "source": "门店销售资料",
+        "version": "v1-2026-11",
+        "is_demo": false
+      }
+    }
+  ]
+}

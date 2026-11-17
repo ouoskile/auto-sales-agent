@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "path": "/console/api/datasets/403fbc9d-3c82-4077-8033-6761821f68f3/hit-testing",
+  "json": {
+    "query": "今天中午吃什么比较好",
+    "retrieval_model": {
+      "search_method": "semantic_search",
+      "reranking_enable": false,
+      "top_k": 3,
+      "score_threshold_enabled": false,
+      "score_threshold": 0.5
+    }
+  },
+  "out": "tools/dify/refs/hit_offtopic.json"
+}

@@ -1,0 +1,11 @@
+{
+  "method": "POST",
+  "path": "/console/api/apps/479d4779-9f96-4553-a8d8-e0401da50d35/workflows/draft/run",
+  "json": {
+    "inputs": {
+      "user_query": "我家三口人，预算15万左右，家里有固定车位能装充电桩，平时主要家用带娃通勤，帮我推荐一台SUV"
+    },
+    "files": []
+  },
+  "out": "C:\\Users\\zhou\\Desktop\\汽车销售智能体\\.tmp_tests\\run_case1.txt"
+}

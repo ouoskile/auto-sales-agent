@@ -1,0 +1,5 @@
+{
+  "method": "GET",
+  "path": "/console/api/apps/479d4779-9f96-4553-a8d8-e0401da50d35/workflows/draft",
+  "out": "tools/dify/refs/draft_current.json"
+}

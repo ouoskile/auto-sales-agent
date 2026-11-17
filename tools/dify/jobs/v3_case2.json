@@ -1,0 +1,11 @@
+{
+  "method": "POST",
+  "path": "/console/api/apps/479d4779-9f96-4553-a8d8-e0401da50d35/workflows/draft/run",
+  "json": {
+    "inputs": {
+      "user_query": "比亚迪海鸥怎么样？"
+    },
+    "files": []
+  },
+  "out": ".tmp_tests\\run_v3_case2.txt"
+}

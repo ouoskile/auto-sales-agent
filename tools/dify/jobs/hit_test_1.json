@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "path": "/console/api/datasets/403fbc9d-3c82-4077-8033-6761821f68f3/hit-testing",
+  "json": {
+    "query": "我刚结婚，预算20万左右，家里有充电桩，想买辆空间大一点的SUV，有什么推荐",
+    "retrieval_model": {
+      "search_method": "semantic_search",
+      "reranking_enable": false,
+      "top_k": 3,
+      "score_threshold_enabled": false,
+      "score_threshold": 0.5
+    }
+  },
+  "raw": true
+}

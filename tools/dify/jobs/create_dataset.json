@@ -1,0 +1,19 @@
+﻿{
+    "method":  "POST",
+    "path":  "/console/api/datasets",
+    "json":  {
+                 "name":  "汽车销售知识库",
+                 "embedding_model_provider":  "langgenius/tongyi/tongyi",
+                 "description":  "门店车型库/销售话术/购车流程/客户画像匹配规则（Dify 演示数据，占位示例）",
+                 "indexing_technique":  "high_quality",
+                 "retrieval_model":  {
+                                         "score_threshold_enabled":  true,
+                                         "search_method":  "semantic_search",
+                                         "reranking_enable":  false,
+                                         "top_k":  3,
+                                         "score_threshold":  0.5
+                                     },
+                 "embedding_model":  "text-embedding-v4",
+                 "permission":  "only_me"
+             }
+}

@@ -1,0 +1,5 @@
+{
+  "method": "GET",
+  "path": "/console/api/datasets/403fbc9d-3c82-4077-8033-6761821f68f3",
+  "out": "tools/dify/refs/dataset_state.json"
+}

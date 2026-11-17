@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "path": "/console/api/datasets/403fbc9d-3c82-4077-8033-6761821f68f3/hit-testing",
+  "json": {
+    "query": "客户画像：预算：15万左右；场景：家用+通勤；家庭人数：3口之家；充电条件：有；意向车型：SUV\n客户原话：我家三口人，预算15万左右，家里有固定车位能装充电桩，平时主要家用带娃通勤，帮我推荐一台SUV\n检索目标：适合该客户的在售车型、参数配置、续航/能耗、空间表现与推荐理由。",
+    "retrieval_model": {
+      "search_method": "semantic_search",
+      "reranking_enable": false,
+      "top_k": 5,
+      "score_threshold_enabled": false,
+      "score_threshold": 0.5
+    }
+  },
+  "raw": true
+}

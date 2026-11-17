@@ -1,0 +1,15 @@
+{
+  "method": "POST",
+  "path": "/console/api/datasets/403fbc9d-3c82-4077-8033-6761821f68f3/hit-testing",
+  "json": {
+    "query": "帮我推荐一台SUV，预算15万左右，家用带娃通勤，家里有固定车位能装充电桩",
+    "retrieval_model": {
+      "search_method": "semantic_search",
+      "reranking_enable": false,
+      "top_k": 5,
+      "score_threshold_enabled": false,
+      "score_threshold": 0.5
+    }
+  },
+  "raw": true
+}

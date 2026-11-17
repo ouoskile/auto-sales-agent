@@ -1,0 +1,13 @@
+{
+  "method": "POST",
+  "path": "/console/api/files/upload",
+  "files": [
+    {
+      "field": "file",
+      "path": "docs/dify/knowledge/01_门店车型库.md"
+    }
+  ],
+  "data": {
+    "source": "datasets"
+  }
+}

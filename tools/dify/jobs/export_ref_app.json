@@ -1,0 +1,6 @@
+{
+  "method": "GET",
+  "path": "/console/api/apps/9ad0e229-6a3d-4808-a6f2-cbd54051a71e/export",
+  "params": { "include_secret": "false" },
+  "out": "tools/dify/refs/app_workflow_ref.json"
+}

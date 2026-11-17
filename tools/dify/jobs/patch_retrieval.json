@@ -1,0 +1,13 @@
+{
+  "method": "PATCH",
+  "path": "/console/api/datasets/403fbc9d-3c82-4077-8033-6761821f68f3",
+  "json": {
+    "retrieval_model": {
+      "search_method": "semantic_search",
+      "reranking_enable": false,
+      "top_k": 3,
+      "score_threshold_enabled": true,
+      "score_threshold": 0.5
+    }
+  }
+}
